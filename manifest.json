@@ -2,7 +2,7 @@
 	"manifest_version": 2,
 	"name": "Grindr Google OAuth",
 	"homepage_url": "https://git.opengrind.org/open-grind/grindr-google-oauth-webextension",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Grindr Google OAuth token extractor for third-party Grindr clients",
 	"browser_specific_settings": {
 		"gecko": {

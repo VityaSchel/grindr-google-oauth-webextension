@@ -121,17 +121,26 @@
 		}
 	};
 	
-	const main = async () => {
-		let armed = false;
-		let android = false;
+	const isCompanion = () => {
 		try {
-			const reply = await api.runtime.sendMessage({ type: "ready" });
-			armed = Boolean(reply?.armed);
-			android = Boolean(reply?.android);
-		} catch {}
-		if (android) {
+			return (api.runtime.getManifest().permissions || []).includes(
+				"nativeMessaging",
+			);
+		} catch {
+			return false;
+		}
+	};
+
+	const main = async () => {
+		if (isCompanion()) {
 			await runAuto();
-		} else if (armed) {
+			return;
+		}
+		let armed = false;
+		try {
+			armed = Boolean((await api.runtime.sendMessage({ type: "ready" }))?.armed);
+		} catch {}
+		if (armed) {
 			await runDesktop();
 		}
 	};
