@@ -3,7 +3,6 @@
 	
 	const api = typeof browser !== "undefined" ? browser : chrome;
 	const RESULT_CHANNEL = "grindr-google-oauth:result";
-	const START_CHANNEL = "grindr-google-oauth:start";
 	const PAGE_SCRIPTS = ["shared/gis-core.js", "shared/page-runner.js"];
 	
 	const injectPageScript = (path) =>
@@ -75,15 +74,6 @@
 			await injectPageScripts();
 		} catch (error) {
 			showError(String(error?.message || error));
-		}
-	};
-	
-	const runAuto = async () => {
-		try {
-			await injectPageScripts();
-			window.postMessage({ channel: START_CHANNEL }, location.origin);
-		} catch (error) {
-			reportError(String(error?.message || error));
 		}
 	};
 	
