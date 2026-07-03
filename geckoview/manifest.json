@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
 	"name": "Grindr Google OAuth",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"description": "Grindr Google OAuth token extractor for third-party Grindr clients",
 	"browser_specific_settings": {
 		"gecko": {
@@ -11,10 +11,6 @@
 		"gecko_android": {
 			"strict_min_version": "142.0"
 		}
-	},
-	"icons": {
-		"32": "icons/icon.png",
-		"64": "icons/icon@2x.png"
 	},
 	"permissions": [
 		"nativeMessaging",

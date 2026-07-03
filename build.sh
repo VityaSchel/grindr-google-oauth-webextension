@@ -32,7 +32,14 @@ for target in "${selected[@]}"; do
 	zip="grindr_google_oauth-$version-$target.zip"
 	rm -rf "$stage" "$out/$zip"
 	mkdir -p "$stage"
-	cp -R shared icons "$target/manifest.json" "$stage/"
+	cp -R shared "$target/manifest.json" "$stage/"
+	icon_refs=$(grep -oE '"icons/[^"]+"' "$target/manifest.json" | tr -d '"' | sort -u || true)
+	if [ -n "$icon_refs" ]; then
+		mkdir -p "$stage/icons"
+		while IFS= read -r ref; do
+			cp "$ref" "$stage/$ref"
+		done <<< "$icon_refs"
+	fi
 	(cd "$stage" && zip -r -q -X "../$zip" . -x '*.DS_Store')
 	echo "built $target -> $out/$zip"
 done
