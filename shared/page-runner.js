@@ -3,6 +3,7 @@
 	
 	const RESULT_CHANNEL = "grindr-google-oauth:result";
 	const START_CHANNEL = "grindr-google-oauth:start";
+	const AWAITING_GESTURE = new Set(["popup_failed_to_open", "popup_closed"]);
 	
 	const postResult = (payload) => {
 		try {
@@ -12,9 +13,6 @@
 			);
 		} catch {}
 	};
-	
-	const isAwaitingUserGesture = (message) =>
-		/popup|gesture|user activation|interact/i.test(message);
 	
 	const gis = () => window.__grindrGis;
 	
@@ -53,13 +51,12 @@
 			const token = await gis().requestAccessToken();
 			postResult({ token });
 		} catch (error) {
-			const message = String(error?.message || error);
 			running = false;
-			if (isAwaitingUserGesture(message)) {
+			if (AWAITING_GESTURE.has(error?.code)) {
 				postResult({ phase: "ready" });
 				return;
 			}
-			postResult({ error: message });
+			postResult({ error: String(error?.message || error) });
 		}
 	};
 	

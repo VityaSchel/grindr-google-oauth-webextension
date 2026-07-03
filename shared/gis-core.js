@@ -12,52 +12,6 @@
 		prompt: "select_account",
 	};
 	
-	const matchAccessTokenInString = (text) => {
-		const match = /access_token["'\s]*[=:]\s*["']?([^"'&\s\\)}\]]+)/i.exec(
-			text,
-		);
-		return match ? decodeURIComponent(match[1]) : null;
-	};
-	
-	const extractAccessToken = (data) => {
-		let found = null;
-		const walk = (value, depth) => {
-			if (found || value == null || depth > 6) return;
-			if (typeof value === "string") {
-				if (!value.includes("access_token")) return;
-				found = matchAccessTokenInString(value);
-				if (found) return;
-				try {
-					walk(JSON.parse(value), depth + 1);
-				} catch {}
-				return;
-			}
-			if (typeof value === "object") {
-				if (typeof value.access_token === "string") {
-					found = value.access_token;
-					return;
-				}
-				for (const key of Object.keys(value)) {
-					walk(value[key], depth + 1);
-					if (found) return;
-				}
-			}
-		};
-		
-		if (typeof data === "string") {
-			const direct = matchAccessTokenInString(data);
-			if (direct) return direct;
-			try {
-				walk(JSON.parse(data), 0);
-			} catch {
-				walk(data, 0);
-			}
-		} else {
-			walk(data, 0);
-		}
-		return found;
-	};
-	
 	const gisOAuth2 = () => window.google?.accounts?.oauth2;
 	
 	let sdkLoad = null;
@@ -105,23 +59,19 @@
 				client_id: clientId,
 				scope,
 				callback: (response) => {
-					const token = response?.access_token || extractAccessToken(response);
+					const token = response?.access_token;
 					if (token) resolveOnce(token);
 					else rejectOnce(new Error("GIS returned no access_token"));
 				},
-				error_callback: (error) =>
-					rejectOnce(
-					new Error(`token client error: ${JSON.stringify(error || {})}`),
-				),
+				error_callback: (error) => {
+					const failure = new Error(error?.type || "token client error");
+					failure.code = error?.type;
+					rejectOnce(failure);
+				},
 			});
 			tokenClient.requestAccessToken({ prompt });
 		});
 	};
 	
-	window.__grindrGis = {
-		DEFAULTS,
-		extractAccessToken,
-		loadGisSdk,
-		requestAccessToken,
-	};
+	window.__grindrGis = { loadGisSdk, requestAccessToken };
 })();

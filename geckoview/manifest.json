@@ -1,19 +1,12 @@
 {
 	"manifest_version": 2,
 	"name": "Grindr Google OAuth",
-	"homepage_url": "https://git.opengrind.org/open-grind/grindr-google-oauth-webextension",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"description": "Grindr Google OAuth token extractor for third-party Grindr clients",
 	"browser_specific_settings": {
 		"gecko": {
 			"id": "grindr-google-oauth-webextension@opengrind.org",
-			"strict_min_version": "140.0",
-			"data_collection_permissions": {
-				"required": [
-					"none"
-				],
-				"optional": []
-			}
+			"strict_min_version": "140.0"
 		},
 		"gecko_android": {
 			"strict_min_version": "142.0"
@@ -23,17 +16,16 @@
 		"32": "icons/icon.png",
 		"64": "icons/icon@2x.png"
 	},
-	"content_security_policy": "script-src 'self'; object-src 'self'",
 	"permissions": [
-		"https://web.grindr.com/*"
+		"nativeMessaging",
+		"geckoViewAddons",
+		"storage"
 	],
-	"browser_action": {
-		"default_title": "Sign in with Google"
-	},
 	"background": {
 		"scripts": [
-			"src/background.js"
-		]
+			"shared/background.js"
+		],
+		"persistent": false
 	},
 	"content_scripts": [
 		{
@@ -41,16 +33,17 @@
 				"https://web.grindr.com/*"
 			],
 			"js": [
-				"src/content.js"
+				"shared/oauth-ui.js",
+				"shared/content.js"
 			],
 			"css": [
-				"src/content.css"
+				"shared/oauth-ui.css"
 			],
 			"run_at": "document_start"
 		}
 	],
 	"web_accessible_resources": [
 		"shared/gis-core.js",
-		"src/page-runner.js"
+		"shared/page-runner.js"
 	]
 }

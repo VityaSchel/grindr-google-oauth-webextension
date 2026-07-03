@@ -4,44 +4,7 @@
 	const api = typeof browser !== "undefined" ? browser : chrome;
 	const RESULT_CHANNEL = "grindr-google-oauth:result";
 	const START_CHANNEL = "grindr-google-oauth:start";
-	const PAGE_SCRIPTS = ["shared/gis-core.js", "src/page-runner.js"];
-	
-	let buttonEl = null;
-	
-	const buildOverlay = () => {
-		document.documentElement.classList.add("grindr-oauth-active");
-		
-		const overlay = document.createElement("div");
-		overlay.className = "grindr-oauth-overlay";
-		
-		const card = document.createElement("div");
-		card.className = "grindr-oauth-card";
-		
-		buttonEl = document.createElement("button");
-		buttonEl.type = "button";
-		buttonEl.className = "grindr-oauth-button";
-		buttonEl.textContent = "Loading...";
-		buttonEl.disabled = true;
-		
-		card.append(buttonEl);
-		overlay.append(card);
-		document.documentElement.append(overlay);
-	};
-	
-	const applyPhase = (phase) => {
-		if (!buttonEl) return;
-		if (phase === "loading") {
-			buttonEl.disabled = true;
-			buttonEl.textContent = "Loading...";
-		} else if (phase === "ready") {
-			buttonEl.disabled = false;
-			buttonEl.textContent = "Sign in with Google";
-			buttonEl.focus();
-		} else if (phase === "signing-in") {
-			buttonEl.disabled = true;
-			buttonEl.textContent = "Signing in with Google...";
-		}
-	};
+	const PAGE_SCRIPTS = ["shared/gis-core.js", "shared/page-runner.js"];
 	
 	const injectPageScript = (path) =>
 		new Promise((resolve, reject) => {
@@ -73,10 +36,7 @@
 	};
 	
 	const showError = (error) => {
-		if (buttonEl) {
-			buttonEl.disabled = false;
-			buttonEl.textContent = "Try again";
-		}
+		window.__grindrOauthUi.setPhase("failed");
 		window.alert(`Sign-in failed: ${error}`);
 		reportError(error);
 	};
@@ -94,7 +54,7 @@
 		if (!isResultMessage(event)) return;
 		const { phase, token, error } = event.data;
 		if (phase) {
-			applyPhase(phase);
+			window.__grindrOauthUi.setPhase(phase);
 			return;
 		}
 		if (handled) return;
@@ -104,7 +64,11 @@
 	
 	const runDesktop = async () => {
 		window.stop();
-		buildOverlay();
+		document.documentElement.replaceChildren(
+			document.createElement("head"),
+			document.createElement("body"),
+		);
+		window.__grindrOauthUi.mount();
 		try {
 			await injectPageScripts();
 		} catch (error) {
@@ -130,7 +94,7 @@
 			return false;
 		}
 	};
-
+	
 	const main = async () => {
 		if (isCompanion()) {
 			await runAuto();
@@ -138,7 +102,9 @@
 		}
 		let armed = false;
 		try {
-			armed = Boolean((await api.runtime.sendMessage({ type: "ready" }))?.armed);
+			armed = Boolean(
+				(await api.runtime.sendMessage({ type: "ready" }))?.armed,
+			);
 		} catch {}
 		if (armed) {
 			await runDesktop();

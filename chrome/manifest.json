@@ -1,0 +1,36 @@
+{
+	"manifest_version": 3,
+	"name": "Grindr Google OAuth",
+	"homepage_url": "https://git.opengrind.org/open-grind/grindr-google-oauth-webextension",
+	"version": "1.0.2",
+	"description": "Grindr Google OAuth token extractor for third-party Grindr clients",
+	"minimum_chrome_version": "102",
+	"icons": {
+		"32": "icons/icon.png",
+		"64": "icons/icon@2x.png"
+	},
+	"content_security_policy": {
+		"extension_pages": "script-src 'self'; object-src 'self'"
+	},
+	"permissions": ["storage"],
+	"action": {
+		"default_title": "Sign in with Google"
+	},
+	"background": {
+		"service_worker": "shared/background.js"
+	},
+	"content_scripts": [
+		{
+			"matches": ["https://web.grindr.com/*"],
+			"js": ["shared/oauth-ui.js", "shared/content.js"],
+			"css": ["shared/oauth-ui.css"],
+			"run_at": "document_start"
+		}
+	],
+	"web_accessible_resources": [
+		{
+			"resources": ["shared/gis-core.js", "shared/page-runner.js"],
+			"matches": ["https://web.grindr.com/*"]
+		}
+	]
+}

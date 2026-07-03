@@ -1,0 +1,63 @@
+html.grindr-oauth-active {
+  color-scheme: dark;
+  background: oklch(0.145 0 0);
+  color: #ffffff;
+  font-size: 16px;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
+html.grindr-oauth-active body {
+  visibility: hidden !important;
+  overflow: hidden;
+}
+
+.grindr-oauth-overlay,
+.grindr-oauth-overlay * {
+  box-sizing: border-box;
+}
+
+.grindr-oauth-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+}
+
+.grindr-oauth-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  max-width: 320px;
+  padding: 32px;
+  text-align: center;
+}
+
+.grindr-oauth-button {
+  appearance: none;
+  border: 0;
+  border-radius: 99px;
+  padding: 0px 12px;
+  font: inherit;
+  font-weight: 500;
+  color: oklch(0.421 0.095 57.708);
+  background-color: oklch(86.521% 0.17664 90.372);
+  cursor: pointer;
+  height: 36px;
+}
+
+.grindr-oauth-button:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.grindr-oauth-button:focus-visible {
+  outline: 2px solid oklch(86.521% 0.17664 90.372);
+  outline-offset: 2px;
+}
