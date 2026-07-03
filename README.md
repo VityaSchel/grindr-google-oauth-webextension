@@ -6,6 +6,8 @@
 
 WebExtension that gets OAuth access token via Google Identity Services (GIS) for Grindr sign-in. Made possible by the fact that GIS refuses to run in embedded app WebViews, and GeckoView forbids the host app from injecting JS into pages.
 
+![Screenshot](./contrib/screenshot.avif)
+
 ## Install
 
 - **Firefox, Librewolf** (desktop & Android):
