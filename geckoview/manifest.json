@@ -18,8 +18,7 @@
 	},
 	"permissions": [
 		"nativeMessaging",
-		"geckoViewAddons",
-		"storage"
+		"geckoViewAddons"
 	],
 	"background": {
 		"scripts": [
