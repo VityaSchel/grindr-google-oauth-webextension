@@ -8,13 +8,19 @@ WebExtension that gets OAuth access token via Google Identity Services (GIS) for
 
 ## Install
 
-- Firefox (desktop & Android): [Download from addons.mozilla.org](https://addons.mozilla.org/en-US/firefox/addon/grindr-google-oauth/)
-- Chrome (desktop): Download from [Releases](https://git.opengrind.org/open-grind/grindr-google-oauth-webextension/releases), unarchive, load the unpacked directory via `chrome://extensions` (Developer mode → "Load unpacked")
-- GeckoView: build using `./build.sh geckoview`, bundle the built `web-ext-artifacts/geckoview/` directory in your app's `assets/` and install it as a built-in extension via `runtime.webExtensionController.ensureBuiltIn(uri, id)` (`nativeMessaging` and `geckoViewAddons` are privileged permissions that only work for a built-in extension)
+- **Firefox, Librewolf** (desktop & Android):
+  - [Download from addons.mozilla.org](https://addons.mozilla.org/en-US/firefox/addon/grindr-google-oauth/) (recommended)
+  - or download `grindr_google_oauth-x.x.x-firefox.zip` from [Releases](https://git.opengrind.org/open-grind/grindr-google-oauth-webextension/releases), unarchive, load the unpacked directory via `about:debugging` (This Firefox → "Load Temporary Add-on")
+- **Google Chrome, Chromium & Chromium-based browsers** (desktop only):
+  - Download `grindr_google_oauth-x.x.x-chrome.zip` from [Releases](https://git.opengrind.org/open-grind/grindr-google-oauth-webextension/releases), unarchive, load the unpacked directory via `chrome://extensions` (Developer mode → "Load unpacked")
+- **GeckoView** (for developers embedding this project into their Android app):
+  - Download `grindr_google_oauth-x.x.x-geckoview.zip` from [Releases](https://git.opengrind.org/open-grind/grindr-google-oauth-webextension/releases), bundle the built `web-ext-artifacts/geckoview/` directory in your app's `assets/` and install it as a built-in extension via `runtime.webExtensionController.ensureBuiltIn(uri, id)` (`nativeMessaging` and `geckoViewAddons` are privileged permissions that only work for a built-in extension)
+
+Alternatively, clone the repository yourself and build the extension using `./build.sh [firefox|chrome|geckoview]` (requires [Bun](https://bun.com)).
 
 ## Usage
 
-Firefox (desktop & Android) and Chrome (desktop):
+**Firefox, Librewolf** (desktop & Android) and **Google Chrome, Chromium & Chromium-based browsers** (desktop only):
 
 1. Install the extension
 2. Click the toolbar icon
@@ -23,7 +29,7 @@ Firefox (desktop & Android) and Chrome (desktop):
 5. Complete the OAuth flow in new tab
 6. Copy the resulting token from the page and paste it into the host app
 
-GeckoView:
+**GeckoView**:
 
 1. Load web.grindr.com in a `GeckoSession` that has this extension installed
 2. The content script auto-runs and the token is delivered via native messaging
