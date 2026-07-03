@@ -64,10 +64,12 @@
 	
 	const runDesktop = async () => {
 		window.stop();
-		document.documentElement.replaceChildren(
-			document.createElement("head"),
-			document.createElement("body"),
-		);
+		const head = document.createElement("head");
+		const viewport = document.createElement("meta");
+		viewport.name = "viewport";
+		viewport.content = "width=device-width, initial-scale=1";
+		head.append(viewport);
+		document.documentElement.replaceChildren(head, document.createElement("body"));
 		window.__grindrOauthUi.mount();
 		try {
 			await injectPageScripts();
@@ -97,7 +99,7 @@
 	
 	const main = async () => {
 		if (isCompanion()) {
-			await runAuto();
+			await runDesktop();
 			return;
 		}
 		let armed = false;
