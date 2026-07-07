@@ -11,8 +11,8 @@ WebExtension that gets OAuth access token via Google Identity Services (GIS) for
 ## Install
 
 - **Firefox, Librewolf** (desktop & Android):
-  <!-- - [Download from addons.mozilla.org](https://addons.mozilla.org/en-US/firefox/addon/grindr-google-oauth/) (recommended) -->
-  - Download `grindr_google_oauth-x.x.x-firefox.zip` from [Releases](https://git.opengrind.org/open-grind/grindr-google-oauth-webextension/releases), unarchive, load the unpacked directory via `about:debugging` (This Firefox → "Load Temporary Add-on")
+  - [Download from addons.mozilla.org](https://addons.mozilla.org/en-US/firefox/addon/grindr-google-oauth/) (recommended)
+  - *or* download `grindr_google_oauth-x.x.x-firefox.zip` from [Releases](https://git.opengrind.org/open-grind/grindr-google-oauth-webextension/releases), unarchive, load the unpacked directory via `about:debugging` (This Firefox → "Load Temporary Add-on")
 - **Google Chrome, Chromium & Chromium-based browsers** (desktop only):
   <!-- - [Download from chrome.google.com](https://chromewebstore.google.com/detail/grindr-web-unlock/oknhfchbiaghpdadehfnlkelhlflpgck) (recommended) -->
   - Download `grindr_google_oauth-x.x.x-chrome.zip` from [Releases](https://git.opengrind.org/open-grind/grindr-google-oauth-webextension/releases), unarchive, load the unpacked directory via `chrome://extensions` (Developer mode → "Load unpacked")
