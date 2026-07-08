@@ -33,6 +33,9 @@ for target in "${selected[@]}"; do
 	rm -rf "$stage" "$out/$zip"
 	mkdir -p "$stage"
 	cp -R shared "$target/manifest.json" "$stage/"
+	if [ -d "$target/overrides" ]; then
+		(cd "$target/overrides" && tar cf - .) | (cd "$stage" && tar xf -)
+	fi
 	icon_refs=$(grep -oE '"icons/[^"]+"' "$target/manifest.json" | tr -d '"' | sort -u || true)
 	if [ -n "$icon_refs" ]; then
 		mkdir -p "$stage/icons"
