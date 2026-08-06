@@ -8,37 +8,17 @@
 			"id": "grindr-google-oauth-webextension@opengrind.org",
 			"strict_min_version": "140.0"
 		},
-		"gecko_android": {
-			"strict_min_version": "142.0"
-		}
+		"gecko_android": { "strict_min_version": "142.0" }
 	},
-	"permissions": [
-		"nativeMessaging",
-		"geckoViewAddons"
-	],
-	"background": {
-		"scripts": [
-			"shared/background.js"
-		],
-		"persistent": false
-	},
+	"permissions": ["nativeMessaging", "geckoViewAddons"],
+	"background": { "scripts": ["shared/background.js"], "persistent": false },
 	"content_scripts": [
 		{
-			"matches": [
-				"https://web.grindr.com/*"
-			],
-			"js": [
-				"shared/oauth-ui.js",
-				"shared/content.js"
-			],
-			"css": [
-				"shared/oauth-ui.css"
-			],
+			"matches": ["https://web.grindr.com/*"],
+			"js": ["shared/oauth-ui.js", "shared/content.js"],
+			"css": ["shared/oauth-ui.css"],
 			"run_at": "document_start"
 		}
 	],
-	"web_accessible_resources": [
-		"shared/gis-core.js",
-		"shared/page-runner.js"
-	]
+	"web_accessible_resources": ["shared/gis-core.js", "shared/page-runner.js"]
 }

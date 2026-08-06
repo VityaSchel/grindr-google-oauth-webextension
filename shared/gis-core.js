@@ -1,19 +1,19 @@
 (() => {
 	"use strict";
-	
+
 	if (window.__grindrGis) return;
-	
+
 	const GIS_SDK_URL = "https://accounts.google.com/gsi/client";
-	
+
 	const DEFAULTS = {
 		clientId:
-		"1036042917246-htcnf9mm3qnis86l47ngp0a9ncqsll7j.apps.googleusercontent.com",
+			"1036042917246-htcnf9mm3qnis86l47ngp0a9ncqsll7j.apps.googleusercontent.com",
 		scope: "email profile",
 		prompt: "select_account",
 	};
-	
+
 	const gisOAuth2 = () => window.google?.accounts?.oauth2;
-	
+
 	let sdkLoad = null;
 	const loadGisSdk = () => {
 		if (gisOAuth2()) return Promise.resolve();
@@ -24,8 +24,11 @@
 					script.src = GIS_SDK_URL;
 					script.async = true;
 					script.onload = resolve;
-					script.onerror = () => reject(new Error("GIS SDK failed to load"));
-					(document.head || document.documentElement).appendChild(script);
+					script.onerror = () =>
+						reject(new Error("GIS SDK failed to load"));
+					(document.head || document.documentElement).appendChild(
+						script,
+					);
 				});
 				for (let attempt = 0; attempt < 100; attempt++) {
 					if (gisOAuth2()) return;
@@ -39,7 +42,7 @@
 		}
 		return sdkLoad;
 	};
-	
+
 	const requestAccessToken = async (options = {}) => {
 		const { clientId, scope, prompt } = { ...DEFAULTS, ...options };
 		await loadGisSdk();
@@ -64,7 +67,9 @@
 					else rejectOnce(new Error("GIS returned no access_token"));
 				},
 				error_callback: (error) => {
-					const failure = new Error(error?.type || "token client error");
+					const failure = new Error(
+						error?.type || "token client error",
+					);
 					failure.code = error?.type;
 					rejectOnce(failure);
 				},
@@ -72,6 +77,6 @@
 			tokenClient.requestAccessToken({ prompt });
 		});
 	};
-	
+
 	window.__grindrGis = { loadGisSdk, requestAccessToken };
 })();

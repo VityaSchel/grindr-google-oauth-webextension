@@ -15,12 +15,8 @@
 		"extension_pages": "script-src 'self'; object-src 'self'"
 	},
 	"permissions": ["storage"],
-	"action": {
-		"default_title": "Sign in with Google"
-	},
-	"background": {
-		"service_worker": "shared/background.js"
-	},
+	"action": { "default_title": "Sign in with Google" },
+	"background": { "service_worker": "shared/background.js" },
 	"content_scripts": [
 		{
 			"matches": ["https://web.grindr.com/*"],

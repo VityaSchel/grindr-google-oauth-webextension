@@ -1,44 +1,46 @@
 (() => {
 	"use strict";
-	
+
 	const RESULT_CHANNEL = "grindr-google-oauth:result";
 	const START_CHANNEL = "grindr-google-oauth:start";
 	const AWAITING_GESTURE = new Set(["popup_failed_to_open", "popup_closed"]);
-	
+
 	const postResult = (payload) => {
 		try {
 			window.postMessage(
 				{ channel: RESULT_CHANNEL, ...payload },
 				location.origin,
 			);
-		} catch {}
+		} catch {
+			// best-effort notification
+		}
 	};
-	
+
 	const gis = () => window.__grindrGis;
-	
+
 	let prepared = false;
 	let loading = false;
 	let running = false;
-	
+
 	const preload = () => {
 		if (prepared || loading || !gis()) return;
 		loading = true;
 		postResult({ phase: "loading" });
 		gis()
-		.loadGisSdk()
-		.then(
-			() => {
-				loading = false;
-				prepared = true;
-				postResult({ phase: "ready" });
-			},
-			(error) => {
-				loading = false;
-				postResult({ error: String(error?.message || error) });
-			},
-		);
+			.loadGisSdk()
+			.then(
+				() => {
+					loading = false;
+					prepared = true;
+					postResult({ phase: "ready" });
+				},
+				(error) => {
+					loading = false;
+					postResult({ error: String(error?.message || error) });
+				},
+			);
 	};
-	
+
 	const requestToken = async () => {
 		if (running) return;
 		if (!gis()) {
@@ -59,18 +61,18 @@
 			postResult({ error: String(error?.message || error) });
 		}
 	};
-	
+
 	preload();
-	
+
 	const isStartMessage = (event) =>
 		event.source === window &&
-	event.origin === location.origin &&
-	event.data?.channel === START_CHANNEL;
-	
+		event.origin === location.origin &&
+		event.data?.channel === START_CHANNEL;
+
 	window.addEventListener("message", (event) => {
 		if (isStartMessage(event)) requestToken();
 	});
-	
+
 	const onButtonClick = (event) => {
 		if (running || !event.isTrusted) return;
 		if (!event.target?.closest?.(".grindr-oauth-button")) return;

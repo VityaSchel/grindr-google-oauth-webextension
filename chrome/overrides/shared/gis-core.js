@@ -8,7 +8,7 @@
 
 	const DEFAULTS = {
 		clientId:
-		"1036042917246-htcnf9mm3qnis86l47ngp0a9ncqsll7j.apps.googleusercontent.com",
+			"1036042917246-htcnf9mm3qnis86l47ngp0a9ncqsll7j.apps.googleusercontent.com",
 		scope: "email profile",
 		prompt: "select_account",
 	};
@@ -78,10 +78,16 @@
 				}
 				const auth = result.authResult;
 				if (auth?.access_token) resolveOnce(auth.access_token);
-				else rejectOnce(auth?.error || "token client error", auth?.error_description);
+				else
+					rejectOnce(
+						auth?.error || "token client error",
+						auth?.error_description,
+					);
 				try {
 					popup?.close();
-				} catch {}
+				} catch {
+					// popup may already be closed
+				}
 			};
 
 			window.addEventListener("message", onMessage);
