@@ -4,13 +4,34 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>Google OAuth token</title>
+		<link rel="stylesheet" href="oauth-ui.css" />
 		<link rel="stylesheet" href="token.css" />
 	</head>
 	<body>
-		<div class="token-container">
-			<p id="token-label">Grindr Google OAuth token:</p>
-			<pre id="token" class="token">Not available</pre>
-		</div>
+		<main class="token-container">
+			<h1 id="token-label" class="token-title">
+				Your Google sign-in token
+			</h1>
+
+			<p id="token" class="token"></p>
+
+			<button
+				id="token-copy"
+				class="grindr-oauth-button token-copy"
+				type="button"
+			>
+				Copy token
+			</button>
+
+			<p id="token-status" class="token-status" role="status"></p>
+
+			<div id="token-notes" class="token-notes">
+				<p class="token-note">
+					Paste it into <strong>Open Grind</strong>. Don't share it
+					publicly. The token expires in about an hour.
+				</p>
+			</div>
+		</main>
 		<script src="token.js"></script>
 	</body>
 </html>
