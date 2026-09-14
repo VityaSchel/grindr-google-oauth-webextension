@@ -1,7 +1,7 @@
 # Grindr Google OAuth WebExtension
 
 > [!NOTE]
-> If you're an Android user, you might be looking for [Open Grind](https://opengrind.org) or [Open Grind Google OAuth Android app](https://git.opengrind.org/open-grind/open-grind-google-oauth-android-app) instead.
+> If you're an Android user, you might be looking for [Open Grind](https://opengrind.org) or [Open Grind Google OAuth Android app](https://git.opengrind.org/open-grind/google-oauth-app) instead.
 
 WebExtension that gets OAuth access token via Google Identity Services (GIS) for Grindr sign-in. Made possible by the fact that GIS refuses to run in embedded app WebViews, and GeckoView forbids the host app from injecting JS into pages.
 
