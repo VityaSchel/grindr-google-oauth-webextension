@@ -4,6 +4,9 @@
 	const api = typeof browser !== "undefined" ? browser : chrome;
 	const SIGN_IN_URL = "https://web.grindr.com/";
 	const NATIVE_APP = "grindr_google_oauth";
+	const NATIVE_ACK_TIMEOUT_MS = 10000;
+	const NO_ANSWER = "The app didn't answer.";
+	const REFUSED = "The app didn't accept the token.";
 	const ARMED_KEY = "armedTabs";
 
 	const sessionStore = api.storage?.session ?? null;
@@ -55,13 +58,28 @@
 			"geckoViewAddons",
 		);
 
-	const sendToNativeApp = async (payload) => {
-		try {
-			await api.runtime.sendNativeMessage(NATIVE_APP, payload);
-		} catch (error) {
-			console.error("[grindr-google-oauth] native message failed", error);
-		}
-	};
+	const sendToNativeApp = (payload) =>
+		new Promise((resolve) => {
+			const timer = setTimeout(
+				() => resolve({ delivered: false, error: NO_ANSWER }),
+				NATIVE_ACK_TIMEOUT_MS,
+			);
+			const settle = (verdict) => {
+				clearTimeout(timer);
+				resolve(verdict);
+			};
+			const refuse = (error) => {
+				console.error("[grindr-google-oauth] app refused", error);
+				settle({ delivered: false, error: REFUSED });
+			};
+			try {
+				api.runtime
+					.sendNativeMessage(NATIVE_APP, payload)
+					.then(() => settle({ delivered: true }), refuse);
+			} catch (error) {
+				refuse(error);
+			}
+		});
 
 	const openSignInTab = async () => {
 		const tab = await api.tabs.create({ url: "about:blank" });
@@ -73,20 +91,19 @@
 	const handleToken = async (tabId, token) => {
 		if (tabId !== undefined) await armed.delete(tabId);
 		if (isGeckoViewBuiltIn()) {
-			await sendToNativeApp({ type: "token", token });
-			return {};
+			return sendToNativeApp({ type: "token", token });
 		}
-		if (tabId !== undefined) {
-			const url = `${api.runtime.getURL("shared/token.html")}#${encodeURIComponent(token)}`;
-			await api.tabs.update(tabId, { url });
+		if (tabId === undefined) {
+			return { delivered: false, error: REFUSED };
 		}
-		return {};
+		const url = `${api.runtime.getURL("shared/token.html")}#${encodeURIComponent(token)}`;
+		await api.tabs.update(tabId, { url });
+		return { delivered: true };
 	};
 
 	const handleError = async (error) => {
 		console.error("[grindr-google-oauth]", error);
-		if (isGeckoViewBuiltIn())
-			await sendToNativeApp({ type: "error", error });
+		if (isGeckoViewBuiltIn()) sendToNativeApp({ type: "error", error });
 		return {};
 	};
 
@@ -101,22 +118,40 @@
 		});
 	}
 
+	const respond = (sendResponse, task, fallback) => {
+		Promise.resolve()
+			.then(task)
+			.catch((error) => {
+				console.error("[grindr-google-oauth]", error);
+				return fallback;
+			})
+			.then(sendResponse);
+		return true;
+	};
+
 	api.runtime.onMessage.addListener((message, sender, sendResponse) => {
 		const tabId = sender?.tab?.id;
 		switch (message?.type) {
 			case "ready":
-				(async () => {
-					sendResponse({
+				return respond(
+					sendResponse,
+					async () => ({
 						armed: tabId !== undefined && (await armed.has(tabId)),
-					});
-				})();
-				return true;
+					}),
+					{ armed: false },
+				);
 			case "token":
-				handleToken(tabId, message.token).then(sendResponse);
-				return true;
+				return respond(
+					sendResponse,
+					() => handleToken(tabId, message.token),
+					{ delivered: false },
+				);
 			case "error":
-				handleError(message.error).then(sendResponse);
-				return true;
+				return respond(
+					sendResponse,
+					() => handleError(message.error),
+					{},
+				);
 			default:
 				return undefined;
 		}

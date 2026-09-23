@@ -61,3 +61,10 @@ html.grindr-oauth-active body {
 	outline: 2px solid oklch(86.521% 0.17664 90.372);
 	outline-offset: 2px;
 }
+
+.grindr-oauth-error {
+	margin: 0;
+	font-size: 14px;
+	line-height: 1.4;
+	color: oklch(0.72 0.16 25);
+}

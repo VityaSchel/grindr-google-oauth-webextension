@@ -33,14 +33,40 @@ Alternatively, clone the repository yourself and build the extension using `./bu
 
 **GeckoView**:
 
-1. Load web.grindr.com in a `GeckoSession` that has this extension installed
-2. The content script auto-runs and the token is delivered via native messaging
-3. The host registers a `MessageDelegate` under the same name as `NATIVE_APP` in `shared/background.js`:
+1. Install the extension as a built-in (see above) and load `https://web.grindr.com/` in a `GeckoSession`. If the session is private, allow the extension in private browsing.
+2. The content script blanks the page and shows a "Sign in with Google" button. After the user signs in, the token is sent to your app over native messaging.
+3. Register the delegate on the extension:
 
 ```kotlin
-controller.setMessageDelegate(extension, delegate, "grindr_google_oauth")
-// delegate.onMessage receives { type: "token", token: "ya29..." }
+runtime.webExtensionController
+    .ensureBuiltIn(
+        "resource://android/assets/grindr-google-oauth/",
+        "grindr-google-oauth-webextension@opengrind.org",
+    )
+    .accept { extension ->
+        extension?.setMessageDelegate(delegate, "grindr_google_oauth")
+        runtime.webExtensionController.setAllowedInPrivateBrowsing(extension!!, true)
+    }
 ```
+
+The delegate receives:
+
+| Message                                   | Meaning                                                     |
+| ----------------------------------------- | ----------------------------------------------------------- |
+| `{ "type": "token", "token": "ya29..." }` | the access token                                            |
+| `{ "type": "error", "error": "..." }`     | sign-in failed; the reason is already on screen in the page |
+
+Answer every message from `onMessage`:
+
+- `GeckoResult.fromValue(true)` once you have taken the token, or for an error you have noted
+- `GeckoResult.fromException(...)` to refuse it, which puts the page back on "Try again"
+- Any other reply, including `false` or `null`, also counts as taken. The page then stays on "Signing in with Google...", so move the session on (the reference app loads `shared/token.html#<token>`)
+- Reply with a primitive. A `JSONObject` reply fails with "Invalid event data for callback" and the page hangs until it times out.
+- Reply within 10 seconds. After that the page shows "The app didn't answer." and re-enables the button.
+
+One delegate is kept per runtime, per extension id and native app name, and the last registration wins. If more than one activity shares the runtime, register again in `onResume()`, or a finished activity keeps the delegate and tokens go nowhere. GeckoView also queues messages sent while no delegate is registered, so register before loading the page.
+
+A session-level delegate (`session.webExtensionController.setMessageDelegate(extension, delegate, name)`) receives messages from extension pages in that session. This extension sends none, so you do not need one.
 
 The token is then to be used with the [`/v8/sessions/thirdparty` endpoint](https://opengrind.org/grindr-api/authentication#login-via-third-party-wip).
 

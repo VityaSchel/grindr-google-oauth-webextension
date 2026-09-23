@@ -4,6 +4,7 @@
 	if (window.__grindrOauthUi) return;
 
 	let buttonEl = null;
+	let errorEl = null;
 
 	const mount = () => {
 		document.documentElement.classList.add("grindr-oauth-active");
@@ -20,13 +21,25 @@
 		buttonEl.textContent = "Loading...";
 		buttonEl.disabled = true;
 
-		card.append(buttonEl);
+		errorEl = document.createElement("p");
+		errorEl.className = "grindr-oauth-error";
+		errorEl.setAttribute("role", "alert");
+		errorEl.hidden = true;
+
+		card.append(buttonEl, errorEl);
 		overlay.append(card);
 		document.documentElement.append(overlay);
 	};
 
+	const setError = (message) => {
+		if (!errorEl) return;
+		errorEl.textContent = message || "";
+		errorEl.hidden = !message;
+	};
+
 	const setPhase = (phase) => {
 		if (!buttonEl) return;
+		if (phase !== "failed") setError("");
 		if (phase === "loading") {
 			buttonEl.disabled = true;
 			buttonEl.textContent = "Loading...";
@@ -43,5 +56,5 @@
 		}
 	};
 
-	window.__grindrOauthUi = { mount, setPhase };
+	window.__grindrOauthUi = { mount, setError, setPhase };
 })();

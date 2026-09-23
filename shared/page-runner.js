@@ -51,6 +51,7 @@
 		postResult({ phase: "signing-in" });
 		try {
 			const token = await gis().requestAccessToken();
+			running = false;
 			postResult({ token });
 		} catch (error) {
 			running = false;

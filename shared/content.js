@@ -3,6 +3,9 @@
 
 	const api = typeof browser !== "undefined" ? browser : chrome;
 	const RESULT_CHANNEL = "grindr-google-oauth:result";
+	const DELIVERY_FAILED = "Couldn't hand the token to the app.";
+	const EXTENSION_GONE =
+		"The extension was updated or turned off. Reload the page to sign in again.";
 	const PAGE_SCRIPTS = ["shared/gis-core.js", "shared/page-runner.js"];
 
 	const injectPageScript = (path) =>
@@ -26,23 +29,60 @@
 
 	let handled = false;
 
-	const handleToken = async (token) => {
-		handled = true;
+	const isGeckoViewBuiltIn = () => {
 		try {
-			await api.runtime.sendMessage({ type: "token", token });
-		} catch (error) {
-			reportError(String(error?.message || error));
+			return (api.runtime.getManifest().permissions || []).includes(
+				"geckoViewAddons",
+			);
+		} catch {
+			return false;
 		}
 	};
 
-	const showError = (error) => {
+	const isExtensionAlive = () => {
+		try {
+			return Boolean(api.runtime?.id);
+		} catch {
+			return false;
+		}
+	};
+
+	const sendMessage = (message) => {
+		try {
+			return Promise.resolve(api.runtime.sendMessage(message));
+		} catch (error) {
+			return Promise.reject(error);
+		}
+	};
+
+	const fail = (message) => {
+		handled = false;
 		window.__grindrOauthUi.setPhase("failed");
-		window.alert(`Sign-in failed: ${error}`);
+		window.__grindrOauthUi.setError(message);
+	};
+
+	const handleToken = async (token) => {
+		handled = true;
+		let delivery;
+		try {
+			delivery = await sendMessage({ type: "token", token });
+		} catch (error) {
+			if (!isExtensionAlive()) fail(EXTENSION_GONE);
+			else if (isGeckoViewBuiltIn())
+				fail(String(error?.message || error));
+			return;
+		}
+		if (delivery?.delivered) return;
+		fail(delivery?.error || DELIVERY_FAILED);
+	};
+
+	const showError = (error) => {
+		fail(`Sign-in failed: ${error}`);
 		reportError(error);
 	};
 
 	const reportError = (error) => {
-		api.runtime.sendMessage({ type: "error", error }).catch(() => {});
+		sendMessage({ type: "error", error }).catch(() => {});
 	};
 
 	const isResultMessage = (event) =>
@@ -81,16 +121,6 @@
 		}
 	};
 
-	const isGeckoViewBuiltIn = () => {
-		try {
-			return (api.runtime.getManifest().permissions || []).includes(
-				"geckoViewAddons",
-			);
-		} catch {
-			return false;
-		}
-	};
-
 	const main = async () => {
 		if (isGeckoViewBuiltIn()) {
 			await runDesktop();
@@ -98,9 +128,7 @@
 		}
 		let armed = false;
 		try {
-			armed = Boolean(
-				(await api.runtime.sendMessage({ type: "ready" }))?.armed,
-			);
+			armed = Boolean((await sendMessage({ type: "ready" }))?.armed);
 		} catch {
 			// no receiver; stay disarmed
 		}
