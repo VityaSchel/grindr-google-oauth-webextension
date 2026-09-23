@@ -81,10 +81,10 @@
 		}
 	};
 
-	const isCompanion = () => {
+	const isGeckoViewBuiltIn = () => {
 		try {
 			return (api.runtime.getManifest().permissions || []).includes(
-				"nativeMessaging",
+				"geckoViewAddons",
 			);
 		} catch {
 			return false;
@@ -92,7 +92,7 @@
 	};
 
 	const main = async () => {
-		if (isCompanion()) {
+		if (isGeckoViewBuiltIn()) {
 			await runDesktop();
 			return;
 		}

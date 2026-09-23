@@ -50,9 +50,9 @@
 		},
 	};
 
-	const isCompanion = () =>
+	const isGeckoViewBuiltIn = () =>
 		(api.runtime.getManifest().permissions || []).includes(
-			"nativeMessaging",
+			"geckoViewAddons",
 		);
 
 	const sendToNativeApp = async (payload) => {
@@ -72,7 +72,7 @@
 
 	const handleToken = async (tabId, token) => {
 		if (tabId !== undefined) await armed.delete(tabId);
-		if (isCompanion()) {
+		if (isGeckoViewBuiltIn()) {
 			await sendToNativeApp({ type: "token", token });
 			return {};
 		}
@@ -85,7 +85,8 @@
 
 	const handleError = async (error) => {
 		console.error("[grindr-google-oauth]", error);
-		if (isCompanion()) await sendToNativeApp({ type: "error", error });
+		if (isGeckoViewBuiltIn())
+			await sendToNativeApp({ type: "error", error });
 		return {};
 	};
 
