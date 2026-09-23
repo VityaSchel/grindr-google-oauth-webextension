@@ -28,7 +28,7 @@ Alternatively, clone the repository yourself and build the extension using `./bu
 2. Click the toolbar icon
 3. A new tab opens with a button
 4. Click "Sign in with Google"
-5. Complete the OAuth flow in new tab
+5. Complete the OAuth flow in the Google window that opens
 6. Tap "Copy token" on the page and paste it into the host app
 
 **GeckoView**:

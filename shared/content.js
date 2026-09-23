@@ -27,6 +27,7 @@
 		}
 	};
 
+	let mounted = false;
 	let handled = false;
 
 	const isGeckoViewBuiltIn = () => {
@@ -63,13 +64,19 @@
 
 	const handleToken = async (token) => {
 		handled = true;
+		if (!isGeckoViewBuiltIn()) {
+			window.__grindrOauthUi.showToken(token, { focus: true });
+			return;
+		}
 		let delivery;
 		try {
 			delivery = await sendMessage({ type: "token", token });
 		} catch (error) {
-			if (!isExtensionAlive()) fail(EXTENSION_GONE);
-			else if (isGeckoViewBuiltIn())
-				fail(String(error?.message || error));
+			fail(
+				isExtensionAlive()
+					? String(error?.message || error)
+					: EXTENSION_GONE,
+			);
 			return;
 		}
 		if (delivery?.delivered) return;
@@ -91,7 +98,7 @@
 		event.data?.channel === RESULT_CHANNEL;
 
 	window.addEventListener("message", (event) => {
-		if (!isResultMessage(event)) return;
+		if (!mounted || !isResultMessage(event)) return;
 		const { phase, token, error } = event.data;
 		if (phase) {
 			window.__grindrOauthUi.setPhase(phase);
@@ -103,6 +110,7 @@
 	});
 
 	const runDesktop = async () => {
+		mounted = true;
 		window.stop();
 		const head = document.createElement("head");
 		const viewport = document.createElement("meta");

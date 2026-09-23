@@ -88,17 +88,9 @@
 		await api.tabs.update(tab.id, { url: SIGN_IN_URL });
 	};
 
-	const handleToken = async (tabId, token) => {
-		if (tabId !== undefined) await armed.delete(tabId);
-		if (isGeckoViewBuiltIn()) {
-			return sendToNativeApp({ type: "token", token });
-		}
-		if (tabId === undefined) {
-			return { delivered: false, error: REFUSED };
-		}
-		const url = `${api.runtime.getURL("shared/token.html")}#${encodeURIComponent(token)}`;
-		await api.tabs.update(tabId, { url });
-		return { delivered: true };
+	const handleToken = async (token) => {
+		if (!isGeckoViewBuiltIn()) return { delivered: false, error: REFUSED };
+		return sendToNativeApp({ type: "token", token });
 	};
 
 	const handleError = async (error) => {
@@ -141,11 +133,9 @@
 					{ armed: false },
 				);
 			case "token":
-				return respond(
-					sendResponse,
-					() => handleToken(tabId, message.token),
-					{ delivered: false },
-				);
+				return respond(sendResponse, () => handleToken(message.token), {
+					delivered: false,
+				});
 			case "error":
 				return respond(
 					sendResponse,
