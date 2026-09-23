@@ -30,7 +30,7 @@ mkdir -p "$out"
 for target in "${selected[@]}"; do
 	stage="$out/$target"
 	zip="grindr_google_oauth-$version-$target.zip"
-	rm -rf "$stage" "$out/$zip"
+	rm -rf "$stage" "${out:?}/$zip"
 	mkdir -p "$stage"
 	cp -R shared "$target/manifest.json" "$stage/"
 	if [ -d "$target/overrides" ]; then
@@ -48,5 +48,5 @@ for target in "${selected[@]}"; do
 done
 
 if printf '%s\n' "${selected[@]}" | grep -qx firefox; then
-	bunx web-ext@latest lint --source-dir "$out/firefox" || true
+	bunx web-ext lint --source-dir "$out/firefox" || true
 fi

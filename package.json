@@ -8,6 +8,7 @@
 		"check:format": "prettier --check .",
 		"sync-config": "opengrind-config sync",
 		"check:config": "opengrind-config check",
+		"lint:firefox": "web-ext lint --source-dir web-ext-artifacts/firefox",
 		"test": "bun test ./test"
 	},
 	"devDependencies": {
@@ -16,6 +17,7 @@
 		"happy-dom": "^20.14.5",
 		"lefthook": "^2.1.10",
 		"prettier": "^3.9.6",
-		"typescript-eslint": "^8.59.2"
+		"typescript-eslint": "^8.59.2",
+		"web-ext": "^10.6.0"
 	}
 }
